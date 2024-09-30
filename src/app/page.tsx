@@ -1,101 +1,101 @@
-import Image from "next/image";
+'use client'
+
+import React, { useRef, useEffect } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { useGLTF, OrbitControls } from '@react-three/drei';
+import Link from 'next/link';
+
+const NavBar = () => (
+  <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-gray-900 text-white z-10">
+    <div className="text-xl font-bold">SAMAR</div>
+    <ul className="flex space-x-4">
+      {['Overview', 'About', 'Experience', 'Skills', 'Projects', 'Contact'].map((item) => (
+        <li key={item}>
+          <Link href={`#${item.toLowerCase()}`} className="hover:text-yellow-400">
+            {item}
+          </Link>
+        </li>
+      ))}
+    </ul>
+    <button className="text-xl">🌓</button>
+  </nav>
+);
+
+const Overview = () => (
+  <section id="overview" className="min-h-screen bg-gray-900 text-yellow-400 flex flex-col items-center justify-center">
+<img src="/me.jpg" alt="Your Name" className="w-48 h-48 rounded-lg mb-4 object-cover" />
+<h1 className="text-4xl font-bold mb-4">Hi I am Samar</h1>
+    <div className="space-x-4">
+      <button className="bg-yellow-500 text-white px-4 py-2 rounded">Contact</button>
+      <button className="bg-yellow-500 text-white px-4 py-2 rounded">Projects</button>
+    </div>
+  </section>
+);
+
+const Skills = () => (
+  <section id="skills" className="min-h-screen bg-gray-900 text-white p-8">
+    <h2 className="text-6xl font-bold mb-8">Skills</h2>
+    <div className="grid grid-cols-2 gap-8">
+      {['Frontend', 'Backend', 'Databases', 'DevOps'].map((category) => (
+        <div key={category} className="bg-gray-800 rounded-lg p-6">
+          <h3 className="text-2xl font-semibold mb-4">{category}</h3>
+          <div className="grid grid-cols-4 gap-4">
+            {/* Add your skill icons here */}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const Projects = () => (
+  <section id="projects" className="min-h-screen bg-gray-900 text-white p-8">
+    <h2 className="text-6xl font-bold mb-8">Projects</h2>
+    <div className="grid grid-cols-3 gap-8">
+      {['Blockchain Wallet', 'Policy Planner', 'Movie Space'].map((project) => (
+        <div key={project} className="bg-gray-800 rounded-lg overflow-hidden">
+          <img src={`/path-to-${project.toLowerCase().replace(' ', '-')}-image.jpg`} alt={project} className="w-full h-48 object-cover" />
+          <div className="p-4">
+            <h3 className="text-xl font-semibold mb-2">{project}</h3>
+            <p className="text-gray-400 mb-4">Project description goes here...</p>
+            <div className="flex space-x-4">
+              <button className="bg-yellow-500 text-white px-4 py-2 rounded">Demo</button>
+              <button className="bg-gray-700 text-white px-4 py-2 rounded">GitHub</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  useEffect(() => {
+    const handleScroll = (e: Event) => {
+      e.preventDefault();
+      const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+      if (href) {
+        const targetId = href.replace('#', '');
+        const elem = document.getElementById(targetId);
+        elem?.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach(link => link.addEventListener('click', handleScroll));
+
+    return () => {
+      links.forEach(link => link.removeEventListener('click', handleScroll));
+    };
+  }, []);
+
+  return (
+    <div className="bg-gray-900 text-white">
+      <NavBar />
+      <Overview />
+      <Skills />
+      <Projects />
+      {/* Add other sections here */}
     </div>
   );
 }
