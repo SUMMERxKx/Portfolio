@@ -3,12 +3,15 @@
 import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Ghost, Mail, Phone, MapPin } from 'lucide-react';
+import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaDatabase, FaGithub } from 'react-icons/fa';
+import { SiTypescript, SiNextdotjs, SiExpress, SiMongodb, SiMysql } from 'react-icons/si'; // Importing from "Simple Icons"
+;
 
 const NavBar = () => (
   <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-8 bg-gray-900 text-white z-10 ">
     <div className="text-xl font-bold">SAMAR</div>
     <ul className="flex space-x-6">
-      {['Overview', 'About', 'Experience', 'Skills', 'Projects', 'Contact'].map((item) => (
+      {['Overview', 'About','Skills', 'Projects', 'Contact'].map((item) => (
         <li key={item}>
           <Link href={`#${item.toLowerCase()}`} className="hover:text-yellow-400">
             {item}
@@ -70,16 +73,49 @@ const About = () => (
 
 const Skills = () => (
   <section id="skills" className="min-h-screen bg-gray-900 text-white p-8">
-    <h2 className="text-6xl font-bold mb-8 text-yellow-400">Skills</h2>
-    <div className="grid grid-cols-2 gap-8">
-      {['Frontend', 'Backend', 'Databases', 'DevOps'].map((category) => (
-        <div key={category} className="bg-gray-800 rounded-lg p-6">
-          <h3 className="text-2xl font-semibold mb-4">{category}</h3>
-          <div className="grid grid-cols-4 gap-4">
-            {/* Add your skill icons here */}
-          </div>
+    <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">Skills</h2>
+    <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Frontend */}
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h3 className="text-2xl font-semibold mb-4">Frontend</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <FaReact size={60} /> {/* React Icon */}
+          <SiNextdotjs size={60} /> {/* Next.js Icon */}
+          <SiTypescript size={60} /> {/* TypeScript Icon */}
+          <FaAngular size={60} /> {/* Angular Icon */}
         </div>
-      ))}
+      </div>
+
+      {/* Backend */}
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h3 className="text-2xl font-semibold mb-4">Backend</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <FaNodeJs size={60} /> {/* Node.js Icon */}
+          <SiExpress size={60} /> {/* Express.js Icon */}
+          <FaPhp size={60} /> {/* PHP Icon */}
+          <FaJava size={60} /> {/* Java Icon */}
+        </div>
+      </div>
+
+      {/* Databases */}
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h3 className="text-2xl font-semibold mb-4">Databases</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <SiMongodb size={60} /> {/* MongoDB Icon */}
+          <SiMysql size={60} /> {/* MySQL Icon */}
+        </div>
+      </div>
+
+      {/* DevOps */}
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h3 className="text-2xl font-semibold mb-4">DevOps</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <FaGitAlt size={60} /> {/* Git Icon */}
+          <FaDocker size={60} /> {/* Docker Icon */}
+          <FaAws size={60} /> {/* AWS Icon */}
+          <FaGithub size={60} />
+        </div>
+      </div>
     </div>
   </section>
 );
@@ -108,7 +144,7 @@ const Projects = () => (
 
 const Contact = () => (
   <section id="contact" className="min-h-screen bg-gray-900 text-white p-8">
-    <h2 className="text-6xl font-bold mb-12 text-yellow-400">Contact</h2>
+    <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">Contact</h2>
     <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-6">
         <h3 className="text-2xl font-semibold mb-4">Get in Touch</h3>
