@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Ghost, Mail, Phone, MapPin } from 'lucide-react';
-import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaDatabase, FaGithub } from 'react-icons/fa';
+import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaDatabase, FaGithub,FaExternalLinkAlt } from 'react-icons/fa';
 import { SiTypescript, SiNextdotjs, SiExpress, SiMongodb, SiMysql } from 'react-icons/si'; // Importing from "Simple Icons"
 ;
 
@@ -120,23 +120,47 @@ const Skills = () => (
   </section>
 );
 
+const projectData = [
+  { name: "AI Flappy Bird", category: "Game" },
+  { name: "Medical Device Monitor", category: "Health" },
+  { name: "AI Chatbot", category: "Social" },
+  { name: "Portfolio", category: "Social" },
+  { name: "Health Tracker", category: "Healthcare" },
+  { name: "AI Flappy Bird", category: "Social" },
+  { name: "AI Chatbot", category: "Artificial Intelligence" },
+  { name: "Currency Changer", category: "Tool" }
+];
+
+const ProjectCard = ({ project }) => (
+  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
+    <img src={`/api/placeholder/400/200`} alt={project.name} className="w-full h-48 object-cover" />
+    <div className="p-6">
+      <h3 className="text-xl font-semibold mb-2 text-yellow-400">{project.name}</h3>
+      <p className="text-gray-400 mb-4">{project.category}</p>
+      <p className="text-gray-300 mb-4">Description for {project.name} goes here. Explain the project's purpose, technologies used, and your role in its development.</p>
+      <div className="flex space-x-4">
+        <button className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-300">
+          <FaExternalLinkAlt className="mr-2" />
+          Demo
+        </button>
+        <button className="flex items-center bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors duration-300">
+          <FaGithub className="mr-2" />
+          GitHub
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 const Projects = () => (
-  <section id="projects" className="min-h-screen bg-gray-900 text-white p-8">
-    <h2 className="text-6xl font-bold mb-8 text-yellow-400">Projects</h2>
-    <div className="grid grid-cols-3 gap-8">
-      {['Blockchain Wallet', 'Policy Planner', 'Movie Space'].map((project) => (
-        <div key={project} className="bg-gray-800 rounded-lg overflow-hidden">
-          <img src={`/path-to-${project.toLowerCase().replace(' ', '-')}-image.jpg`} alt={project} className="w-full h-48 object-cover" />
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">{project}</h3>
-            <p className="text-gray-400 mb-4">Project description goes here...</p>
-            <div className="flex space-x-4">
-              <button className="bg-yellow-500 text-white px-4 py-2 rounded">Demo</button>
-              <button className="bg-gray-700 text-white px-4 py-2 rounded">GitHub</button>
-            </div>
-          </div>
-        </div>
-      ))}
+  <section id="projects" className="min-h-screen bg-gray-900 text-white py-16 px-8">
+    <div className="max-w-6xl mx-auto">
+      <h2 className="text-6xl font-bold mb-12 text-yellow-400">Projects</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {projectData.map((project) => (
+          <ProjectCard key={project.name} project={project} />
+        ))}
+      </div>
     </div>
   </section>
 );
