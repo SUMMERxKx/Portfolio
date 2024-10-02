@@ -57,6 +57,7 @@ const Overview = () => {
       <h1 className="text-4xl font-bold mb-4 text-yellow-400">
         Hi, I am <TypingAnimation text="Samar" speed={150} />
       </h1>
+      <p className="text-2xl mb-8">Full Stack Developer | ML Enthusiast</p>
       <div className="flex space-x-4 mb-12">
         <Link href="#about" className="bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition duration-300">
           About Me
