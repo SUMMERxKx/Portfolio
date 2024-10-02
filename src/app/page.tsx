@@ -43,7 +43,6 @@ const NavBar = () => {
 };
 
 const Overview = () => {
-  const { isDark } = useTheme();
   return (
     <section id="overview" className="min-h-screen flex flex-col items-center justify-center relative text-gray-900 dark:text-white bg-white dark:bg-gray-900">
       <Image 
