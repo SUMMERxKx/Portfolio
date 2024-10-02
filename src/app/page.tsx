@@ -121,14 +121,39 @@ const Skills = () => (
 );
 
 const projectData = [
-  { name: "AI Flappy Bird", category: "Game" },
-  { name: "Medical Device Monitor", category: "Health" },
-  { name: "AI Chatbot", category: "Social" },
-  { name: "Portfolio", category: "Social" },
-  { name: "Health Tracker", category: "Healthcare" },
-  { name: "AI Flappy Bird", category: "Social" },
-  { name: "AI Chatbot", category: "Artificial Intelligence" },
-  { name: "Currency Changer", category: "Tool" }
+  { name: "AI Flappy Bird",
+    category: "Game",
+    description: "A Python-based Flappy Bird clone using Pygame and NEAT, where AI birds evolve over generations to improve their gameplay. The neural network adapts using evolutionary algorithms, learning to navigate obstacles for better performance."    
+    
+    },
+  { name: "Medical Device Monitor", 
+    category: "Health",
+    description: "A comprehensive system simulating medical devices, processing real-time data, and visualizing metrics on a web dashboard. It includes data analysis and alert generation to monitor devices like ECG and Blood Pressure in real time."
+   },
+  { name: "Cohere Chatbot", 
+    category: "Social",
+    description: "A Cohere-themed chatbot built with React and integrated with the Gemini API, providing users with seamless answers on Cohere-related topics and exchange rates. The chatbot features a responsive, custom UI for smooth text-based interactions."
+  },
+  { name: "Portfolio", 
+    category: "Social",
+    description: "A personal portfolio built with React and Next.js, showcasing projects and skills in a modern, responsive design. The website highlights professional work, features smooth navigation, and provides an engaging user experience across all devices." 
+  },
+  { name: "Real Estate ML Model", 
+    category: "Financial",
+    description: "A machine learning model built to predict real estate prices based on attributes like crime rate, property tax, and room count. Using Python and Scikit-learn, the project involves data preprocessing, feature engineering to estimate house prices." 
+  },
+  { name: "Silver Spoon", 
+    category: "Restaurant",
+    description: "A responsive restaurant website built with HTML, CSS, and JavaScript, showcasing a fictional restaurant. Features include a navigation bar, menu display, about section, customer reviews, and contact details. Developed as a front-end project without backend functionality."
+  },
+  { name: "Plagiarism Form", 
+    category: "Tool",
+    description: "A C# and Python-based application that streamlines the submission of ED-05 plagiarism forms. The project features an intuitive form interface, efficient data processing, form saving, search functionality, and progress tracking to enhance user experience and efficiency."
+  },
+  { name: "Currency Changer", 
+    category: "Tool",
+    description: "A simple application that converts amounts between different currencies using real-time exchange rates from an external API. It features a user-friendly interface with support for multiple currencies, offering quick and accurate conversions for personal or professional use."
+  }
 ];
 
 const ProjectCard = ({ project }) => (
@@ -137,7 +162,7 @@ const ProjectCard = ({ project }) => (
     <div className="p-6">
       <h3 className="text-xl font-semibold mb-2 text-yellow-400">{project.name}</h3>
       <p className="text-gray-400 mb-4">{project.category}</p>
-      <p className="text-gray-300 mb-4">Description for {project.name} goes here. Explain the project's purpose, technologies used, and your role in its development.</p>
+      <p className="text-gray-300 mb-4">{project.description}</p>
       <div className="flex space-x-4">
         <button className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-300">
           <FaExternalLinkAlt className="mr-2" />
