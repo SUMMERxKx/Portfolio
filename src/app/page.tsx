@@ -1,5 +1,4 @@
 'use client';
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,7 +18,6 @@ const useTheme = () => useContext(ThemeContext);
 
 const NavBar = () => {
   const { isDark, toggleTheme } = useTheme();
-
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-8 z-10 bg-opacity-90 backdrop-blur-sm transition-colors duration-300 ease-in-out bg-white dark:bg-gray-900 shadow-md">
@@ -84,7 +82,6 @@ const About = () => (
         Outside of my studies, I enjoy playing football, video games, and watching movies—Game of Thrones being one of my all-time favorites, and I&apos;m always up for a conversation about it!
         </p>
       </div>
-
       <div>
         <h3 className="text-2xl font-semibold text-yellow-400 mb-4">02 My Passion</h3>
         <p>
@@ -94,7 +91,6 @@ const About = () => (
         Over time, this passion turned into a desire to solve real-world problems, and my competitive nature continues to fuel my drive to learn new technologies every day.
         </p>
       </div>
-
       <div>
         <h3 className="text-2xl font-semibold text-yellow-400 mb-4">03 My Goals</h3>
         <p>
@@ -104,6 +100,7 @@ const About = () => (
     </div>
   </section>
 );
+
 
 const Skills = () => (
   <section id="skills" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8">
