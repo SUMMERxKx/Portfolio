@@ -1,14 +1,20 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Ghost, Mail, Phone, MapPin } from 'lucide-react';
 import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaGithub, FaExternalLinkAlt, FaLinkedin, FaInstagram, FaArrowDown } from 'react-icons/fa';
 import { SiTypescript, SiNextdotjs, SiExpress, SiMongodb, SiMysql } from 'react-icons/si';
 import TypingAnimation from './TypingAnimation';
+import ThemeToggle from './ThemeToggle'; // Import ThemeToggle component
 
-// Create a context for the theme
-const ThemeContext = createContext({
+// Update the ThemeContext type
+type ThemeContextType = {
+  isDark: boolean;
+  toggleTheme: () => void;
+};
+
+const ThemeContext = createContext<ThemeContextType>({
   isDark: true,
   toggleTheme: () => {},
 });
@@ -17,7 +23,7 @@ const ThemeContext = createContext({
 const useTheme = () => useContext(ThemeContext);
 
 const NavBar = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-8 z-10 bg-opacity-90 backdrop-blur-sm transition-colors duration-300 ease-in-out bg-white dark:bg-gray-900 shadow-md">
@@ -31,9 +37,7 @@ const NavBar = () => {
             </li>
           ))}
         </ul>
-        <button onClick={toggleTheme} className="text-xl">
-          <Ghost size={24} className={isDark ? 'text-yellow-400' : 'text-gray-800'} />
-        </button>
+        <ThemeToggle />
       </nav>
       <div className="h-px bg-yellow-400 w-full"></div>
     </>
@@ -67,6 +71,8 @@ const Overview = () => {
     </section>
   );
 };
+
+
 
 const About = () => (
   <section id="about" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8">
@@ -307,7 +313,8 @@ const Footer = () => (
   </>
 );
 
-const ThemeProvider = ({ children }) => {
+
+const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [isDark, setIsDark] = useState(true);
 
   const toggleTheme = () => {
@@ -349,6 +356,7 @@ export default function Home() {
       links.forEach(link => link.removeEventListener('click', handleScroll as unknown as EventListener));
     };
   }, []);
+
 
   return (
     <ThemeProvider>
