@@ -18,7 +18,7 @@ const ThemeContext = createContext({
 const useTheme = () => useContext(ThemeContext);
 
 const NavBar = () => {
-  const { toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <>
@@ -34,13 +34,14 @@ const NavBar = () => {
           ))}
         </ul>
         <button onClick={toggleTheme} className="text-xl">
-          <Ghost size={24} className="text-yellow-400 dark:text-gray-800" />
+          <Ghost size={24} className={isDark ? 'text-yellow-400' : 'text-gray-800'} />
         </button>
       </nav>
       <div className="h-px bg-yellow-400 w-full"></div>
     </>
   );
 };
+
 const Overview = () => {
   return (
     <section id="overview" className="min-h-screen flex flex-col items-center justify-center relative text-gray-900 dark:text-white bg-white dark:bg-gray-900">
