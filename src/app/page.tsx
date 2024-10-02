@@ -1,40 +1,72 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Ghost, Mail, Phone, MapPin } from 'lucide-react';
-import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaDatabase, FaGithub,FaExternalLinkAlt,FaLinkedin, FaInstagram, } from 'react-icons/fa';
-import { SiTypescript, SiNextdotjs, SiExpress, SiMongodb, SiMysql } from 'react-icons/si'; // Importing from "Simple Icons"
+import { FaReact, FaNodeJs, FaPhp, FaJava, FaAws, FaDocker, FaGitAlt, FaAngular, FaGithub, FaExternalLinkAlt, FaLinkedin, FaInstagram, FaArrowDown } from 'react-icons/fa';
+import { SiTypescript, SiNextdotjs, SiExpress, SiMongodb, SiMysql } from 'react-icons/si';
+import TypingAnimation from './TypingAnimation';
 
+// Create a context for the theme
+const ThemeContext = createContext({
+  isDark: true,
+  toggleTheme: () => {},
+});
 
-const NavBar = () => (
-  <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-8 bg-gray-900 text-white z-10 ">
-    <div className="text-xl font-bold">SAMAR</div>
-    <ul className="flex space-x-6">
-      {['Overview', 'About','Skills', 'Projects', 'Contact'].map((item) => (
-        <li key={item}>
-          <Link href={`#${item.toLowerCase()}`} className="hover:text-yellow-400">
-            {item}
-          </Link>
-        </li>
-      ))}
-    </ul>
-    <button className="text-xl">
-      <Ghost size={24} />
-    </button>
-  </nav>
-);
+// Custom hook to use the theme
+const useTheme = () => useContext(ThemeContext);
 
-const Overview = () => (
-  <section id="overview" className="min-h-screen bg-gray-900 text-yellow-400 flex flex-col items-center justify-center">
-    <img src="/me.jpg" alt="Your Name" className="w-72 h-72 rounded-lg mb-4 object-cover" />
-    <h1 className="text-4xl font-bold mb-4">Hi I am Samar</h1>
-    
-  </section>
-);
+const NavBar = () => {
+  const { isDark, toggleTheme } = useTheme();
+
+  return (
+    <>
+ <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-8 z-10 bg-opacity-90 backdrop-blur-sm transition-colors duration-300 ease-in-out bg-white dark:bg-gray-900 shadow-md">
+        <div className="text-xl font-bold text-gray-900 dark:text-white">SAMAR</div>
+        <ul className="flex space-x-6">
+          {['Overview', 'About', 'Skills', 'Projects', 'Contact'].map((item) => (
+            <li key={item}>
+              <Link href={`#${item.toLowerCase()}`} className="text-gray-900 dark:text-white hover:text-yellow-400 transition-colors duration-300">
+                {item}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <button onClick={toggleTheme} className="text-xl">
+          <Ghost size={24} className={isDark ? 'text-yellow-400' : 'text-gray-800'} />
+        </button>
+      </nav>
+      <div className="h-px bg-yellow-400 w-full"></div>
+    </>
+  );
+};
+
+const Overview = () => {
+  const { isDark } = useTheme();
+  return (
+    <section id="overview" className="min-h-screen flex flex-col items-center justify-center relative text-gray-900 dark:text-white bg-white dark:bg-gray-900">
+      <img src="/me.jpg" alt="Your Name" className="w-72 h-72 rounded-full mb-8 object-cover border-4 border-yellow-400 shadow-lg" />
+      <h1 className="text-4xl font-bold mb-4 text-yellow-400">
+        Hi, I am <TypingAnimation text="Samar" speed={150} />
+      </h1>
+      <p className="text-2xl mb-8">Full Stack Developer | ML Enthusiast</p>
+      <div className="flex space-x-4 mb-12">
+        <a href="#about" className="bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition duration-300">
+          About Me
+        </a>
+        <a href="#projects" className="bg-transparent border-2 border-yellow-400 text-yellow-400 px-6 py-3 rounded-full font-semibold hover:bg-yellow-400 hover:text-black transition duration-300">
+          My Projects
+        </a>
+      </div>
+      <div className="absolute bottom-10 animate-bounce text-yellow-400">
+        <FaArrowDown size={24} />
+      </div>
+    </section>
+  );
+};
 
 const About = () => (
-  <section id="about" className="min-h-screen bg-gray-900 text-white p-8">
+  <section id="about" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8">
     <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">About</h2>
     
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -69,11 +101,11 @@ const About = () => (
 );
 
 const Skills = () => (
-  <section id="skills" className="min-h-screen bg-gray-900 text-white p-8">
+  <section id="skills" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8">
     <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">Skills</h2>
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Frontend */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
         <h3 className="text-2xl font-semibold mb-4">Frontend</h3>
         <div className="grid grid-cols-4 gap-4">
           <FaReact size={60} /> {/* React Icon */}
@@ -84,7 +116,7 @@ const Skills = () => (
       </div>
 
       {/* Backend */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
         <h3 className="text-2xl font-semibold mb-4">Backend</h3>
         <div className="grid grid-cols-4 gap-4">
           <FaNodeJs size={60} /> {/* Node.js Icon */}
@@ -95,7 +127,7 @@ const Skills = () => (
       </div>
 
       {/* Databases */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
         <h3 className="text-2xl font-semibold mb-4">Databases</h3>
         <div className="grid grid-cols-4 gap-4">
           <SiMongodb size={60} /> {/* MongoDB Icon */}
@@ -104,7 +136,7 @@ const Skills = () => (
       </div>
 
       {/* DevOps */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
         <h3 className="text-2xl font-semibold mb-4">DevOps</h3>
         <div className="grid grid-cols-4 gap-4">
           <FaGitAlt size={60} /> {/* Git Icon */}
@@ -176,12 +208,12 @@ const projectData = [
 ];
 
 const ProjectCard = ({ project }) => (
-  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
-    <img src={project.image} alt={project.name} className="w-full h-48 object-cover" />  {/* Image from public */}
+  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
+    <img src={project.image} alt={project.name} className="w-full h-48 object-cover" />
     <div className="p-6">
       <h3 className="text-xl font-semibold mb-2 text-yellow-400">{project.name}</h3>
-      <p className="text-gray-400 mb-4">{project.category}</p>
-      <p className="text-gray-300 mb-4">{project.description}</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-4">{project.category}</p>
+      <p className="text-gray-800 dark:text-gray-300 mb-4">{project.description}</p>
       <div className="flex space-x-4">
         {project.demoLink && (
           <a href={project.demoLink} target="_blank" rel="noopener noreferrer" className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-300">
@@ -190,7 +222,7 @@ const ProjectCard = ({ project }) => (
           </a>
         )}
         {project.githubLink && (
-          <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="flex items-center bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors duration-300">
+          <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="flex items-center bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-300">
             <FaGithub className="mr-2" />
             GitHub
           </a>
@@ -203,7 +235,7 @@ const ProjectCard = ({ project }) => (
 
 
 const Projects = () => (
-  <section id="projects" className="min-h-screen bg-gray-900 text-white py-16 px-8">
+  <section id="projects" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-16 px-8">
     <div className="max-w-6xl mx-auto">
       <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">Projects</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -217,7 +249,7 @@ const Projects = () => (
 
 
 const Contact = () => (
-  <section id="contact" className="min-h-screen bg-gray-900 text-white p-8">
+  <section id="contact" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8">
     <h2 className="text-6xl font-bold mb-12 text-yellow-400 space-y-8 max-w-4xl mx-auto">Contact</h2>
     <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-6">
@@ -256,16 +288,42 @@ const Contact = () => (
 );
 
 const Footer = () => (
-  <footer className="bg-gray-900 text-white p-4 text-center">
-    <p>&copy; 2024 Samar. All rights reserved.</p>
-  </footer>
+  <>
+    <div className="h-px accent-bg w-full"></div>
+    <footer className="p-4 text-center bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      <p>&copy; 2024 Samar. All rights reserved.</p>
+    </footer>
+  </>
 );
+
+const ThemeProvider = ({ children }) => {
+  const [isDark, setIsDark] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+  };
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [isDark]);
+
+  return (
+    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
 
 export default function Home() {
   useEffect(() => {
-    const handleScroll = (e: Event) => {
+    const handleScroll = (e) => {
       e.preventDefault();
-      const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+      const href = e.currentTarget.getAttribute('href');
       if (href) {
         const targetId = href.replace('#', '');
         const elem = document.getElementById(targetId);
@@ -282,16 +340,16 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-gray-900 text-white">
-      <NavBar />
-      <div className="h-px bg-gray-700 mx-4"></div> {/* Line to distinguish NavBar */}
-      <Overview />
-      <About />
-      <Skills />
-      <Projects />
-      <Contact />
-      <div className="h-px bg-gray-700 mx-4"></div> {/* Line to distinguish Footer */}
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className="transition-colors duration-300">
+        <NavBar />
+        <Overview />
+        <About />
+        <Skills />
+        <Projects />
+        <Contact />
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }
