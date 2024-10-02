@@ -151,7 +151,16 @@ const Skills = () => (
   </section>
 );
 
-const ProjectCard = ({ project }) => (
+interface Project {
+  name: string;
+  category: string;
+  description: string;
+  image: string;
+  githubLink: string;
+  demoLink?: string;
+}
+
+const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   <div className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
     <Image src={project.image} alt={project.name} width={400} height={200} className="w-full h-48 object-cover" />
     <div className="p-6">
@@ -176,7 +185,7 @@ const ProjectCard = ({ project }) => (
   </div>
 );
 
-const projectData = [
+const projectData: Project[] = [
   { 
     name: "AI Flappy Bird",
     category: "Game",
