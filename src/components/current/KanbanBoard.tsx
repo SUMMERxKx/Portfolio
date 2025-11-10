@@ -1,8 +1,16 @@
 'use client';
 
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, {
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { ClipboardCheck, Heading, LayoutPanelTop, NotebookPen, Plus, Trash2 } from 'lucide-react';
-import { nanoid } from 'nanoid';
+
+import { supabase } from '@/lib/supabaseClient';
 
 type CardType = 'task' | 'note' | 'heading';
 type LayoutOption = 'default' | 'wide';
@@ -11,46 +19,80 @@ type BoardItem = {
   id: string;
   type: CardType;
   title: string;
-  body?: string;
-  progress?: number;
+  body: string | null;
+  progress: number | null;
   layout: LayoutOption;
 };
 
-const STORAGE_KEY = 'current-tasks-items';
-const OWNER_KEY = 'current-tasks-owner';
-const ACCESS_CODE = process.env.NEXT_PUBLIC_OWNER_ACCESS_CODE ?? '';
+type BoardItemRow = {
+  id: string;
+  type: CardType;
+  title: string;
+  body: string | null;
+  progress: number | null;
+  layout: LayoutOption | null;
+};
 
-const defaultItems: BoardItem[] = [
+const ACCESS_CODE = process.env.NEXT_PUBLIC_OWNER_ACCESS_CODE ?? '';
+const TABLE_NAME = 'kanban_items';
+const CHANNEL_NAME = 'realtime:kanban_items';
+
+const defaultSeed: BoardItem[] = [
   {
-    id: 'heading-focus',
+    id: 'seed-heading',
     type: 'heading',
     title: 'Focused work',
+    body: null,
+    progress: null,
     layout: 'default',
   },
   {
-    id: 'task-portfolio',
+    id: 'seed-task-1',
     type: 'task',
     title: 'Refine portfolio layout',
-    body: 'Tighten spacing, simplify copy, and keep the visuals consistent on every page.',
+    body: 'Tighten spacing, simplify copy, and keep visuals consistent across pages.',
     progress: 70,
     layout: 'default',
   },
   {
-    id: 'task-ai-tooling',
+    id: 'seed-task-2',
     type: 'task',
     title: 'Prototype AI helper scripts',
-    body: 'Experiment with lightweight models for faster content suggestions inside current projects.',
+    body: 'Experiment with lightweight models for faster content suggestions in the UI.',
     progress: 35,
     layout: 'default',
   },
   {
-    id: 'note-ideas',
+    id: 'seed-note',
     type: 'note',
     title: 'Notebook',
-    body: '• Gather feedback about this tasks board\n• Test evaluation metrics for the ML capstone refresh',
+    body: '• Collect feedback about the board\n• Evaluate ML experiments\n• Share updates weekly',
+    progress: null,
     layout: 'wide',
   },
 ];
+
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `item-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const iconByType: Record<CardType, React.ElementType> = {
+  task: ClipboardCheck,
+  note: NotebookPen,
+  heading: Heading,
+};
+
+const mapRowToItem = (row: BoardItemRow): BoardItem => ({
+  id: row.id,
+  type: row.type,
+  title: row.title,
+  body: row.body,
+  progress: row.progress,
+  layout: row.layout ?? 'default',
+});
 
 type OwnerState = {
   isOwner: boolean;
@@ -67,8 +109,7 @@ const useOwnerAccess = (): OwnerState => {
     if (typeof window === 'undefined') {
       return;
     }
-    const stored = window.localStorage.getItem(OWNER_KEY);
-    if (stored === 'true') {
+    if (window.localStorage.getItem('current-tasks-owner') === 'true') {
       setIsOwner(true);
     }
   }, []);
@@ -78,9 +119,10 @@ const useOwnerAccess = (): OwnerState => {
       setError('NEXT_PUBLIC_OWNER_ACCESS_CODE is not set.');
       return;
     }
+
     if (code.trim() === ACCESS_CODE) {
+      window.localStorage.setItem('current-tasks-owner', 'true');
       setIsOwner(true);
-      window.localStorage.setItem(OWNER_KEY, 'true');
       setError(null);
     } else {
       setError('Access code not recognised. Please try again.');
@@ -88,54 +130,23 @@ const useOwnerAccess = (): OwnerState => {
   };
 
   const logout = () => {
+    window.localStorage.removeItem('current-tasks-owner');
     setIsOwner(false);
     setError(null);
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(OWNER_KEY);
-    }
   };
 
   return { isOwner, error, login, logout };
 };
 
-const useBoardItems = (initial: BoardItem[], canPersist: boolean) => {
-  const [items, setItems] = useState<BoardItem[]>(initial);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as BoardItem[];
-        setItems(parsed);
-      } catch (error) {
-        console.error('Failed to parse stored board items', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!canPersist || typeof window === 'undefined') {
-      return;
-    }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items, canPersist]);
-
-  return { items, setItems };
-};
-
-const iconByType: Record<CardType, React.ElementType> = {
-  task: ClipboardCheck,
-  note: NotebookPen,
-  heading: Heading,
-};
-
 const KanbanBoard = () => {
-  const { isOwner, login, logout, error } = useOwnerAccess();
-  const { items, setItems } = useBoardItems(defaultItems, isOwner);
+  const { isOwner, error: ownerError, login, logout } = useOwnerAccess();
+  const [items, setItems] = useState<BoardItem[]>([]);
+  const [isInitialising, setIsInitialising] = useState(true);
+  const [isPending, startTransition] = useTransition();
   const [loginCode, setLoginCode] = useState('');
+
+  const pendingIds = useRef(new Set<string>());
+  const seedApplied = useRef(false);
 
   const [formType, setFormType] = useState<CardType>('task');
   const [formTitle, setFormTitle] = useState('');
@@ -145,26 +156,150 @@ const KanbanBoard = () => {
 
   const orderedItems = useMemo(() => items, [items]);
 
-  const updateItem = (id: string, updates: Partial<BoardItem>) => {
-    if (!isOwner) return;
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
-  };
+  const fetchItems = React.useCallback(async () => {
+    setIsInitialising(true);
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .order('inserted_at', { ascending: false });
 
-  const deleteItem = (id: string) => {
-    if (!isOwner) return;
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+    console.log('Fetched Supabase items:', data);
+    console.log('Error fetching:', error);
 
-  const toggleLayout = (id: string) => {
-    if (!isOwner) return;
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, layout: item.layout === 'default' ? 'wide' : 'default' } : item
+    if (error) {
+      console.error('Failed to fetch kanban items:', error);
+      if (!seedApplied.current) {
+        setItems(defaultSeed);
+        seedApplied.current = true;
+      }
+      setIsInitialising(false);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      seedApplied.current = true;
+      setItems(data.map((row) => mapRowToItem(row as BoardItemRow)));
+    } else if (!seedApplied.current) {
+      setItems(defaultSeed);
+      seedApplied.current = true;
+    } else {
+      setItems([]);
+    }
+
+    setIsInitialising(false);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const initialise = async () => {
+      await fetchItems();
+      if (!active) return;
+    };
+
+    initialise();
+
+    const channel = supabase
+      .channel(CHANNEL_NAME)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: TABLE_NAME },
+        (payload) => {
+          console.log('Realtime event:', payload);
+          const newRow = payload.new as BoardItemRow | undefined;
+          const oldRow = payload.old as BoardItemRow | undefined;
+          const targetId = newRow?.id ?? oldRow?.id;
+
+          if (targetId && pendingIds.current.has(targetId)) {
+            pendingIds.current.delete(targetId);
+            if (payload.eventType === 'UPDATE' && newRow) {
+              setItems((prev) =>
+                prev.map((item) => (item.id === newRow.id ? mapRowToItem(newRow) : item))
+              );
+            }
+            return;
+          }
+
+          setItems((prev) => {
+            switch (payload.eventType) {
+              case 'INSERT': {
+                if (!newRow) return prev;
+                const mapped = mapRowToItem(newRow);
+                if (prev.some((item) => item.id === mapped.id)) {
+                  return prev;
+                }
+                return [mapped, ...prev];
+              }
+              case 'UPDATE': {
+                if (!newRow) return prev;
+                return prev.map((item) => (item.id === newRow.id ? mapRowToItem(newRow) : item));
+              }
+              case 'DELETE': {
+                if (!oldRow) return prev;
+                return prev.filter((item) => item.id !== oldRow.id);
+              }
+              default:
+                return prev;
+            }
+          });
+        }
       )
-    );
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [fetchItems]);
+
+  const handleUpdateItem = async (id: string, updates: Partial<BoardItem>) => {
+    if (!isOwner) return;
+
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+
+    pendingIds.current.add(id);
+    const { error } = await supabase
+      .from(TABLE_NAME)
+      .update({
+        ...('type' in updates && { type: updates.type }),
+        ...('title' in updates && { title: updates.title }),
+        ...('body' in updates && { body: updates.body ?? null }),
+        ...('progress' in updates && { progress: updates.progress ?? null }),
+        ...('layout' in updates && { layout: updates.layout ?? 'default' }),
+      })
+      .eq('id', id);
+
+    if (error) {
+      pendingIds.current.delete(id);
+      console.error('Failed to update board item:', error);
+      await fetchItems();
+    }
   };
 
-  const addItem = (event: FormEvent<HTMLFormElement>) => {
+  const handleDeleteItem = async (id: string) => {
+    if (!isOwner) return;
+
+    setItems((prev) => prev.filter((item) => item.id !== id));
+    pendingIds.current.add(id);
+
+    const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id);
+
+    if (error) {
+      pendingIds.current.delete(id);
+      console.error('Failed to delete board item:', error);
+      await fetchItems();
+    }
+  };
+
+  const handleToggleLayout = (id: string) => {
+    if (!isOwner) return;
+    const current = items.find((item) => item.id === id);
+    if (!current) return;
+    const nextLayout: LayoutOption = current.layout === 'default' ? 'wide' : 'default';
+    handleUpdateItem(id, { layout: nextLayout });
+  };
+
+  const handleAddItem = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isOwner) return;
 
@@ -181,44 +316,116 @@ const KanbanBoard = () => {
       return;
     }
 
-    const newItem: BoardItem = {
-      id: `item-${nanoid(6)}`,
+    const id = generateId();
+    const optimistic: BoardItem = {
+      id,
       type: formType,
       title:
         trimmedTitle ||
         (formType === 'note' ? 'Note' : formType === 'heading' ? 'Heading' : 'New task'),
-      body: trimmedBody || undefined,
-      progress: formType === 'task' ? formProgress : undefined,
+      body: trimmedBody || null,
+      progress: formType === 'task' ? formProgress : null,
       layout: formLayout,
     };
 
-    setItems((prev) => [newItem, ...prev]);
+    setItems((prev) => [optimistic, ...prev]);
+    pendingIds.current.add(id);
+
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .insert({
+        id,
+        type: optimistic.type,
+        title: optimistic.title,
+        body: optimistic.body,
+        progress: optimistic.progress,
+        layout: optimistic.layout,
+      })
+      .select('*')
+      .single();
+
+    if (error) {
+      pendingIds.current.delete(id);
+      console.error('Insert failed:', error.message);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      return;
+    }
+
+    pendingIds.current.delete(id);
+    if (data) {
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? mapRowToItem(data as BoardItemRow) : item))
+      );
+    }
+
     setFormTitle('');
     setFormBody('');
     setFormProgress(50);
     setFormLayout('default');
   };
 
-  const addQuickNote = () => {
+  const handleAddQuickNote = async () => {
     if (!isOwner) return;
-    const quickNote: BoardItem = {
-      id: `note-${nanoid(5)}`,
+
+    const id = generateId();
+    const optimistic: BoardItem = {
+      id,
       type: 'note',
       title: 'Quick note',
       body: '',
+      progress: null,
       layout: 'default',
     };
-    setItems((prev) => [quickNote, ...prev]);
+
+    startTransition(() => {
+      setItems((prev) => [optimistic, ...prev]);
+    });
+    pendingIds.current.add(id);
+
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .insert({
+        id,
+        type: optimistic.type,
+        title: optimistic.title,
+        body: optimistic.body,
+        progress: null,
+        layout: optimistic.layout,
+      })
+      .select('*')
+      .single();
+
+    if (error) {
+      pendingIds.current.delete(id);
+      console.error('Insert failed:', error.message);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      return;
+    }
+
+    pendingIds.current.delete(id);
+    if (data) {
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? mapRowToItem(data as BoardItemRow) : item))
+      );
+    }
   };
+
+  if (isInitialising) {
+    return (
+      <div className="frosted-card rounded-3xl p-6 text-center text-sm text-foreground-muted">
+        Loading tasks…
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
       <div className="frosted-card flex flex-col gap-4 rounded-3xl p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 md:flex-nowrap">
           <div>
             <h2 className="text-sm uppercase tracking-[0.4em] text-secondary-soft">Owner access</h2>
             <p className="mt-2 text-sm text-foreground-muted">
-              Visitors can read these cards. Editing is limited to the owner login.
+              Add or edit cards with your access code. Visitors can follow along in real time.
             </p>
           </div>
           {isOwner ? (
@@ -259,12 +466,12 @@ const KanbanBoard = () => {
             editing.
           </p>
         )}
-        {error && <p className="text-sm text-[#c0392b]">{error}</p>}
+        {ownerError && <p className="text-sm text-[#c0392b]">{ownerError}</p>}
       </div>
 
       {isOwner && (
         <div className="frosted-card rounded-3xl p-6 text-sm text-foreground-muted">
-          <form onSubmit={addItem} className="grid gap-4 md:grid-cols-2">
+          <form onSubmit={handleAddItem} className="grid gap-4 md:grid-cols-2">
             <label className="flex flex-col gap-2">
               <span className="text-[11px] uppercase tracking-[0.35em] text-secondary-soft">Card type</span>
               <select
@@ -346,13 +553,15 @@ const KanbanBoard = () => {
               <button
                 type="submit"
                 className="rounded-full border border-primary bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-primary-strong"
+                disabled={isPending}
               >
                 Add card
               </button>
               <button
                 type="button"
-                onClick={addQuickNote}
+                onClick={handleAddQuickNote}
                 className="rounded-full border border-soft px-5 py-3 text-xs uppercase tracking-[0.3em] text-foreground-muted transition hover:border-primary hover:text-primary"
+                disabled={isPending}
               >
                 Add quick note
               </button>
@@ -379,7 +588,7 @@ const KanbanBoard = () => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => toggleLayout(item.id)}
+                      onClick={() => handleToggleLayout(item.id)}
                       className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
                       aria-label="Toggle width"
                     >
@@ -387,7 +596,7 @@ const KanbanBoard = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => deleteItem(item.id)}
+                      onClick={() => handleDeleteItem(item.id)}
                       className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
                       aria-label="Delete card"
                     >
@@ -401,7 +610,7 @@ const KanbanBoard = () => {
                 isOwner ? (
                   <input
                     value={item.title}
-                    onChange={(event) => updateItem(item.id, { title: event.target.value })}
+                    onChange={(event) => handleUpdateItem(item.id, { title: event.target.value })}
                     className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-2xl text-foreground outline-none transition focus:border-primary"
                   />
                 ) : (
@@ -411,8 +620,8 @@ const KanbanBoard = () => {
                 <>
                   {isOwner ? (
                     <input
-                      value={item.title}
-                      onChange={(event) => updateItem(item.id, { title: event.target.value })}
+                      value={item.title ?? ''}
+                      onChange={(event) => handleUpdateItem(item.id, { title: event.target.value })}
                       className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-lg text-foreground outline-none transition focus:border-primary"
                       placeholder={item.type === 'task' ? 'Task title' : 'Note title'}
                     />
@@ -422,7 +631,7 @@ const KanbanBoard = () => {
                   {isOwner ? (
                     <textarea
                       value={item.body ?? ''}
-                      onChange={(event) => updateItem(item.id, { body: event.target.value })}
+                      onChange={(event) => handleUpdateItem(item.id, { body: event.target.value })}
                       rows={item.type === 'note' ? 4 : 3}
                       className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
                       placeholder={item.type === 'note' ? 'Write your note…' : 'Add details'}
@@ -442,10 +651,7 @@ const KanbanBoard = () => {
                     <span>{item.progress ?? 0}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface-soft">
-                    <div
-                      className="h-2 rounded-full bg-primary"
-                      style={{ width: `${item.progress ?? 0}%` }}
-                    />
+                    <div className="h-2 rounded-full bg-primary" style={{ width: `${item.progress ?? 0}%` }} />
                   </div>
                   {isOwner && (
                     <input
@@ -453,7 +659,9 @@ const KanbanBoard = () => {
                       min={0}
                       max={100}
                       value={item.progress ?? 0}
-                      onChange={(event) => updateItem(item.id, { progress: Number(event.target.value) })}
+                      onChange={(event) =>
+                        handleUpdateItem(item.id, { progress: Number(event.target.value) })
+                      }
                       className="w-full"
                       style={{ accentColor: '#f3a572' }}
                     />
