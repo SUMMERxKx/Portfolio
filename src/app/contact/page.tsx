@@ -24,7 +24,7 @@ const ContactPage = () => {
           </p>
           <p className="flex items-center gap-3">
             <MapPin size={20} className="text-primary" />
-            <span>Kamloops, British Columbia, Canada</span>
+            <span>Richmond, British Columbia, Canada</span>
           </p>
         </div>
         <div className="mt-8 flex flex-wrap gap-4 text-xs uppercase tracking-[0.3em] text-secondary-soft">

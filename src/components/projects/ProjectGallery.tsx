@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
-import { ExternalLink, Github, Search } from 'lucide-react';
+import { Github, Search } from 'lucide-react';
 
 export type Repo = {
   id: number;
@@ -107,17 +107,6 @@ const ProjectGallery = ({ repos }: ProjectGalleryProps) => {
                 <Github size={16} />
                 GitHub
               </Link>
-              {repo.homepage && (
-                <Link
-                  href={repo.homepage}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-full border border-soft px-4 py-2 text-xs uppercase tracking-[0.3em] text-foreground-soft transition hover:border-primary hover:text-primary"
-                >
-                  <ExternalLink size={16} />
-                  Demo
-                </Link>
-              )}
             </div>
             <p className="mt-4 text-xs text-foreground-subtle">
               Updated {new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(repo.updated_at))}

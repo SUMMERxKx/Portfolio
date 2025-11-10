@@ -3,6 +3,12 @@ import Link from 'next/link';
 
 const quickLinks = [
   {
+    title: 'Experience',
+    description: 'See the timeline of co-ops, contracts, and roles shaping my craft.',
+    href: '/experience',
+    cta: 'View experience',
+  },
+  {
     title: 'Projects',
     description: 'Browse my latest work, pulled directly from GitHub.',
     href: '/projects',
