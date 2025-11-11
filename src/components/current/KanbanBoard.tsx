@@ -8,7 +8,16 @@ import React, {
   useState,
   useTransition,
 } from 'react';
-import { ClipboardCheck, Heading, LayoutPanelTop, NotebookPen, Plus, Trash2 } from 'lucide-react';
+import {
+  ClipboardCheck,
+  Heading,
+  LayoutPanelTop,
+  NotebookPen,
+  PencilLine,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react';
 
 import { supabase } from '@/lib/supabaseClient';
 
@@ -571,106 +580,16 @@ const KanbanBoard = () => {
       )}
 
       <div className="grid gap-6 md:grid-cols-3">
-        {orderedItems.map((item) => {
-          const Icon = iconByType[item.type];
-          const spanClass = item.layout === 'wide' ? 'md:col-span-2' : 'md:col-span-1';
-
-          return (
-            <article key={item.id} className={`frosted-card flex flex-col gap-4 rounded-3xl p-6 ${spanClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2 text-foreground">
-                  <Icon size={18} className="text-primary" />
-                  <p className="text-xs uppercase tracking-[0.3em] text-secondary-subtle">
-                    {item.type === 'task' ? 'Task' : item.type === 'note' ? 'Note' : 'Heading'}
-                  </p>
-                </div>
-                {isOwner && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleLayout(item.id)}
-                      className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
-                      aria-label="Toggle width"
-                    >
-                      <LayoutPanelTop size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
-                      aria-label="Delete card"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {item.type === 'heading' ? (
-                isOwner ? (
-                  <input
-                    value={item.title}
-                    onChange={(event) => handleUpdateItem(item.id, { title: event.target.value })}
-                    className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-2xl text-foreground outline-none transition focus:border-primary"
-                  />
-                ) : (
-                  <h2 className="text-2xl text-foreground">{item.title}</h2>
-                )
-              ) : (
-                <>
-                  {isOwner ? (
-                    <input
-                      value={item.title ?? ''}
-                      onChange={(event) => handleUpdateItem(item.id, { title: event.target.value })}
-                      className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-lg text-foreground outline-none transition focus:border-primary"
-                      placeholder={item.type === 'task' ? 'Task title' : 'Note title'}
-                    />
-                  ) : (
-                    item.title && <h3 className="text-lg text-foreground">{item.title}</h3>
-                  )}
-                  {isOwner ? (
-                    <textarea
-                      value={item.body ?? ''}
-                      onChange={(event) => handleUpdateItem(item.id, { body: event.target.value })}
-                      rows={item.type === 'note' ? 4 : 3}
-                      className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-                      placeholder={item.type === 'note' ? 'Write your note…' : 'Add details'}
-                    />
-                  ) : (
-                    item.body && (
-                      <p className="whitespace-pre-line text-sm text-foreground-muted">{item.body}</p>
-                    )
-                  )}
-                </>
-              )}
-
-              {item.type === 'task' && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs text-foreground-muted">
-                    <span>Progress</span>
-                    <span>{item.progress ?? 0}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-surface-soft">
-                    <div className="h-2 rounded-full bg-primary" style={{ width: `${item.progress ?? 0}%` }} />
-                  </div>
-                  {isOwner && (
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={item.progress ?? 0}
-                      onChange={(event) =>
-                        handleUpdateItem(item.id, { progress: Number(event.target.value) })
-                      }
-                      className="w-full"
-                      style={{ accentColor: '#f3a572' }}
-                    />
-                  )}
-                </div>
-              )}
-            </article>
-          );
-        })}
+        {orderedItems.map((item) => (
+          <BoardItemCard
+            key={item.id}
+            item={item}
+            isOwner={isOwner}
+            onDelete={handleDeleteItem}
+            onToggleLayout={handleToggleLayout}
+            onUpdate={handleUpdateItem}
+          />
+        ))}
       </div>
     </div>
   );
@@ -678,4 +597,231 @@ const KanbanBoard = () => {
 
 export default KanbanBoard;
 
+
+type BoardItemCardProps = {
+  item: BoardItem;
+  isOwner: boolean;
+  onUpdate: (id: string, updates: Partial<BoardItem>) => Promise<void>;
+  onDelete: (id: string) => Promise<void> | void;
+  onToggleLayout: (id: string) => void;
+};
+
+const BoardItemCard = ({ item, isOwner, onUpdate, onDelete, onToggleLayout }: BoardItemCardProps) => {
+  const Icon = iconByType[item.type];
+  const spanClass = item.layout === 'wide' ? 'md:col-span-2' : 'md:col-span-1';
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(item.title ?? '');
+  const [editedBody, setEditedBody] = useState(item.body ?? '');
+  const [editedProgress, setEditedProgress] = useState(item.progress ?? 0);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setEditedTitle(item.title ?? '');
+      setEditedBody(item.body ?? '');
+      setEditedProgress(item.progress ?? 0);
+    }
+  }, [item.title, item.body, item.progress, isEditing]);
+
+  const handleStartEditing = () => {
+    if (!isOwner) return;
+    setEditedTitle(item.title ?? '');
+    setEditedBody(item.body ?? '');
+    setEditedProgress(item.progress ?? 0);
+    setIsEditing(true);
+  };
+
+  const handleCancelEditing = () => {
+    setIsEditing(false);
+    setEditedTitle(item.title ?? '');
+    setEditedBody(item.body ?? '');
+    setEditedProgress(item.progress ?? 0);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!isOwner) return;
+
+    const trimmedTitle = editedTitle.trim();
+    const trimmedBody = editedBody.trim();
+
+    const updates: Partial<BoardItem> = {};
+
+    if (item.type === 'heading') {
+      if (trimmedTitle !== (item.title ?? '')) {
+        updates.title = trimmedTitle || 'Untitled heading';
+      }
+    } else {
+      if (trimmedTitle !== (item.title ?? '')) {
+        updates.title =
+          trimmedTitle || (item.type === 'note' ? 'Note' : item.type === 'task' ? 'Task' : item.title ?? '');
+      }
+      if (trimmedBody !== (item.body ?? '')) {
+        updates.body = trimmedBody || null;
+      }
+      if (item.type === 'task' && editedProgress !== (item.progress ?? 0)) {
+        updates.progress = editedProgress;
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await onUpdate(item.id, updates);
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <article className={`frosted-card flex flex-col gap-4 rounded-3xl p-6 ${spanClass}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2 text-foreground">
+          <Icon size={18} className="text-primary" />
+          <p className="text-xs uppercase tracking-[0.3em] text-secondary-subtle">
+            {item.type === 'task' ? 'Task' : item.type === 'note' ? 'Note' : 'Heading'}
+          </p>
+        </div>
+        {isOwner && (
+          <div className="flex items-center gap-2">
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => onToggleLayout(item.id)}
+                className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
+                aria-label="Toggle width"
+              >
+                <LayoutPanelTop size={16} />
+              </button>
+            )}
+            {!isEditing ? (
+              <button
+                type="button"
+                onClick={handleStartEditing}
+                className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
+                aria-label="Edit card"
+              >
+                <PencilLine size={16} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleCancelEditing}
+                className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
+                aria-label="Cancel editing"
+              >
+                <X size={16} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onDelete(item.id)}
+              className="rounded-full border border-soft p-2 text-foreground-muted transition hover:border-primary hover:text-primary"
+              aria-label="Delete card"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {isEditing ? (
+        <>
+          {item.type === 'heading' ? (
+            <input
+              value={editedTitle}
+              onChange={(event) => setEditedTitle(event.target.value)}
+              className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-2xl text-foreground outline-none transition focus:border-primary"
+              placeholder="Heading text"
+            />
+          ) : (
+            <>
+              <input
+                value={editedTitle}
+                onChange={(event) => setEditedTitle(event.target.value)}
+                className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-lg text-foreground outline-none transition focus:border-primary"
+                placeholder={item.type === 'task' ? 'Task title' : 'Note title'}
+              />
+              <textarea
+                value={editedBody}
+                onChange={(event) => setEditedBody(event.target.value)}
+                rows={item.type === 'note' ? 4 : 3}
+                className="w-full rounded-2xl border border-soft bg-surface-soft px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+                placeholder={item.type === 'note' ? 'Write your note…' : 'Add details'}
+              />
+            </>
+          )}
+
+          {item.type === 'task' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs text-foreground-muted">
+                <span>Progress</span>
+                <span>{editedProgress}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-surface-soft">
+                <div className="h-2 rounded-full bg-primary" style={{ width: `${editedProgress}%` }} />
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={editedProgress}
+                onChange={(event) => setEditedProgress(Number(event.target.value))}
+                className="w-full"
+                style={{ accentColor: '#f3a572' }}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleSaveEdit}
+              disabled={isSaving}
+              className="rounded-full border border-primary bg-primary px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:border-soft disabled:bg-surface-soft disabled:text-foreground-muted"
+            >
+              {isSaving ? 'Saving…' : 'Save edit'}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelEditing}
+              disabled={isSaving}
+              className="rounded-full border border-soft px-5 py-2 text-xs uppercase tracking-[0.3em] text-foreground-muted transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          {item.type === 'heading' ? (
+            <h2 className="text-2xl text-foreground">{item.title}</h2>
+          ) : (
+            <>
+              {item.title && <h3 className="text-lg text-foreground">{item.title}</h3>}
+              {item.body && <p className="whitespace-pre-line text-sm text-foreground-muted">{item.body}</p>}
+            </>
+          )}
+
+          {item.type === 'task' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs text-foreground-muted">
+                <span>Progress</span>
+                <span>{item.progress ?? 0}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-surface-soft">
+                <div className="h-2 rounded-full bg-primary" style={{ width: `${item.progress ?? 0}%` }} />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </article>
+  );
+};
 
