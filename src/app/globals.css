@@ -143,3 +143,22 @@ a {
 .timeline-arm {
   filter: drop-shadow(0 0 12px rgba(243, 165, 114, 0.5));
 }
+
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti 0.5s ease-out forwards;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}

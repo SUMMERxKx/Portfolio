@@ -10,9 +10,10 @@ const links = [
   { href: '/experience', label: 'Experience' },
   { href: '/projects', label: 'Projects' },
   { href: '/skills', label: 'Skills' },
-  { href: '/about', label: 'About Me' },
+  { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
   { href: '/current', label: 'Current' },
+  { href: '/daily', label: 'Daily' },
 ];
 
 const NavBar = () => {
