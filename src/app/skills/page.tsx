@@ -26,7 +26,7 @@ const skillSets = [
     title: 'DevOps',
     description:
       'Deployments, observability, and automation that make releasing features straightforward.',
-    items: ['GitHub Actions', 'Docker', 'AWS', 'Vercel', 'Railway', 'Linux'],
+    items: ['GitHub Actions', 'Docker', 'AWS', 'Vercel', 'Azure', 'Linux'],
     icon: Workflow,
   },
   {
