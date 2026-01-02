@@ -12,9 +12,8 @@ const links = [
   { href: '/skills', label: 'Skills' },
   { href: '/about', label: 'About' },
   { href: '/coop-final-project', label: 'Coop' },
+  { href: '/task-board', label: 'Task Board' },
   { href: '/contact', label: 'Contact' },
-  { href: '/current', label: 'Current' },
-  { href: '/daily', label: 'Daily' },
 ];
 
 const NavBar = () => {
