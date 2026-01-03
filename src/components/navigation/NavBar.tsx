@@ -12,7 +12,7 @@ const links = [
   { href: '/skills', label: 'Skills' },
   { href: '/about', label: 'About' },
   { href: '/coop-final-project', label: 'Coop' },
-  { href: '/task-board', label: 'Task Board' },
+  { href: '/task-board', label: 'Board' },
   { href: '/contact', label: 'Contact' },
 ];
 

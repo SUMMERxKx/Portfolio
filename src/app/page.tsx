@@ -20,12 +20,6 @@ const quickLinks = [
     href: '/skills',
     cta: 'View skills',
   },
-  {
-    title: 'Current Tasks',
-    description: 'Check in on what I’m improving and delivering right now.',
-    href: '/current',
-    cta: 'Open board',
-  },
 ];
 
 const focusAreas = [
@@ -59,12 +53,6 @@ const Home = () => {
               className="rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[0_18px_35px_rgba(243,165,114,0.28)] transition hover:bg-primary-strong"
             >
               View projects
-            </Link>
-            <Link
-              href="/current"
-              className="rounded-full border border-soft px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-foreground-muted transition hover:border-primary hover:text-primary"
-            >
-              See current tasks
             </Link>
           </div>
         </div>

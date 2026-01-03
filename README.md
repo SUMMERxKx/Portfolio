@@ -1,80 +1,180 @@
-# Samar's Portfolio Website
+# Portfolio Website
 
-This is a personal portfolio website showcasing the projects and skills of **Samar Khajuria**, built with Next.js and React. The website features a modern and responsive design with dynamic animations and smooth transitions. It highlights Samar's professional work, full-stack development expertise, machine learning projects, and automation passion.
+A modern, responsive portfolio website built with Next.js, React, and TypeScript. This site showcases projects, experience, skills, and professional work.
 
-## Technologies Used
+## 🚀 Tech Stack
 
-- **Next.js**: A React framework for server-side rendering and static site generation.
-- **React**: A JavaScript library for building user interfaces.
-- **Tailwind CSS**: A utility-first CSS framework for styling.
-- **Lucide-react**: Icon library for modern SVG icons.
-- **React Icons**: A library that provides popular icons like FontAwesome, Feather, etc.
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom CSS variables
+- **Icons**: Lucide React
+- **3D Graphics**: React Three Fiber, Drei
+- **Database**: Supabase (PostgreSQL)
+- **Deployment**: Vercel
 
-## Features
+## 📁 Project Structure
 
-- **Dark Mode Toggle**: Users can switch between light and dark themes with a single click.
-- **Smooth Navigation**: Seamless scrolling and transitions between sections.
-- **Dynamic Typing Animation**: An interactive typing animation on the homepage.
-- **Responsive Design**: Optimized for various screen sizes, from mobile to desktop.
-- **Project Cards**: Showcases projects with demo and GitHub links (if available).
+```
+portfolio-website/
+├── public/                    # Static assets (images, fonts, etc.)
+│   └── assets/
+│       └── companies/        # Company logos and images
+│
+├── src/
+│   ├── app/                  # Next.js App Router pages
+│   │   ├── about/           # About page
+│   │   ├── contact/         # Contact page
+│   │   ├── coop-final-project/  # Co-op reflection blog post
+│   │   ├── experience/      # Professional experience timeline
+│   │   ├── projects/        # GitHub projects gallery
+│   │   ├── skills/          # Technical skills showcase
+│   │   ├── task-board/      # Task board redirect page
+│   │   ├── layout.tsx       # Root layout with NavBar and Footer
+│   │   ├── page.tsx         # Homepage
+│   │   └── globals.css      # Global styles and CSS variables
+│   │
+│   ├── components/          # Reusable React components
+│   │   ├── layout/         # Layout components (Footer)
+│   │   ├── navigation/     # Navigation components (NavBar)
+│   │   ├── experience/     # Experience-specific components
+│   │   ├── projects/       # Project-specific components
+│   │   └── daily/          # Daily tasks components (legacy)
+│   │
+│   ├── data/               # Static data files
+│   │   └── experience.ts   # Experience entries data
+│   │
+│   └── lib/                # Utility libraries
+│       └── supabaseClient.ts  # Supabase client configuration
+│
+├── supabase_migration.sql   # Database migration scripts
+├── SUPABASE_SETUP.md        # Supabase setup documentation
+└── README.md                # This file
+```
 
-## Sections
+## 🛠️ Getting Started
 
-### 1. Overview
+### Prerequisites
 
-This section includes a brief introduction to Samar, including:
+- Node.js 18+ and npm/yarn/pnpm
+- (Optional) Supabase account if using database features
 
-- **Name**: Displayed with a typing animation effect.
-- **Title**: "Full Stack Developer | ML Enthusiast."
-- **Call-to-Action Buttons**: Links to the "About Me" and "My Projects" sections.
+### Installation
 
-### 2. About
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SUMMERxKx/Portfolio.git
+   cd portfolio-website
+   ```
 
-The "About" section provides more details about Samar:
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-- **Background**: Currently a third-year Computing Science student at Thompson Rivers University.
-- **Interests**: Full stack development, machine learning, and automation.
-- **Personal Interests**: Football, video games, and watching movies (especially Game of Thrones).
+3. **Set up environment variables** (if using Supabase)
+   ```bash
+   cp .env.example .env.local
+   ```
+   Add your Supabase URL and anon key to `.env.local`
 
-### 3. Skills
+4. **Run the development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
 
-Showcases technical skills categorized into:
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-- **Frontend**: React, Next.js, TypeScript, Angular.
-- **Backend**: Node.js, Express.js, PHP, Java.
-- **Databases**: MongoDB, MySQL.
-- **DevOps**: Git, Docker, AWS.
+## 📝 Available Scripts
 
-### 4. Projects
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-Displays a collection of Samar's projects, including:
+## 🎨 Key Features
 
-- **AI Flappy Bird**: Python-based game with NEAT AI for learning.
-- **Medical Device Monitor**: Simulates medical devices with real-time data visualization.
-- **Cohere Chatbot**: React chatbot integrated with the Gemini API.
-- **Real Estate ML Model**: Machine learning model for predicting real estate prices.
-- **Silver Spoon**: Responsive restaurant website built with HTML, CSS, and JavaScript.
-- **Plagiarism Form**: C# and Python-based plagiarism form submission tool.
-- **Currency Changer**: A currency conversion tool using real-time exchange rates.
+### Pages
 
-Each project card includes links to the **GitHub repository** and, if applicable, a **Demo** link.
+- **Home** (`/`) - Introduction and quick links
+- **About** (`/about`) - Personal background and interests
+- **Experience** (`/experience`) - Professional timeline
+- **Projects** (`/projects`) - GitHub projects gallery
+- **Skills** (`/skills`) - Technical skills organized by category
+- **Co-op Final Project** (`/coop-final-project`) - Co-op reflection blog post
+- **Task Board** (`/task-board`) - Redirect to external task board
+- **Contact** (`/contact`) - Contact information and social links
 
-### 5. Contact
+### Design System
 
-Contains:
+The site uses a custom design system with CSS variables defined in `globals.css`:
 
-- **Contact Information**: Email, phone number, and location.
-- **Social Media Links**: LinkedIn, Instagram, GitHub icons with external links.
+- **Colors**: Custom color palette with primary (orange), accent (blue), and semantic colors
+- **Typography**: Inter (body) and Playfair Display (headings)
+- **Components**: Reusable frosted-glass cards, buttons, and layouts
+- **Responsive**: Mobile-first design with breakpoints
 
-## Getting Started
+### Components
 
-To run the development server:
+- **NavBar** - Responsive navigation with mobile menu
+- **SiteFooter** - Site footer component
+- **ExperienceTimeline** - Timeline visualization for work experience
+- **ProjectGallery** - GitHub projects display component
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🔧 Configuration
+
+### Supabase Setup
+
+See `SUPABASE_SETUP.md` for detailed instructions on setting up Supabase integration.
+
+### Environment Variables
+
+Create a `.env.local` file with:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## 📦 Dependencies
+
+Key dependencies include:
+- `next` - React framework
+- `react` & `react-dom` - UI library
+- `@supabase/supabase-js` - Database client
+- `lucide-react` - Icon library
+- `tailwindcss` - CSS framework
+- `@react-three/fiber` & `@react-three/drei` - 3D graphics
+
+See `package.json` for the complete list.
+
+## 🚀 Deployment
+
+The site is configured for deployment on Vercel:
+
+1. Push your code to GitHub
+2. Import the repository in Vercel
+3. Add environment variables if needed
+4. Deploy
+
+## 📄 License
+
+This project is private and personal.
+
+## 👤 Author
+
+**Samar Khajuria**
+- Portfolio: [Your Portfolio URL]
+- GitHub: [@SUMMERxKx](https://github.com/SUMMERxKx)
+
+---
+
+Built with ❤️ using Next.js and TypeScript
