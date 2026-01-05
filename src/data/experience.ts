@@ -23,7 +23,7 @@ export const experienceData: ExperienceEntry[] = [
   },
   {
     company: 'Thompson Rivers University',
-    title: 'E-Learning Support Technician (Co-op)',
+    title: 'Web Developer (Co-op)',
     duration: 'May 2025 – Aug 2025 · 4 mos',
     location: 'Kamloops, BC · On-site',
     logo: '/thompson_rivers_university_logo.jpeg',
