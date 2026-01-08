@@ -50,7 +50,7 @@ const Home = () => {
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/projects"
-              className="rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[0_18px_35px_rgba(243,165,114,0.28)] transition hover:bg-primary-strong"
+              className="rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[0_18px_35px_rgba(125,211,252,0.28)] transition hover:bg-primary-strong"
             >
               View projects
             </Link>

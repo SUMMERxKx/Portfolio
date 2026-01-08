@@ -551,7 +551,7 @@ const KanbanBoard = () => {
                     value={formProgress}
                     onChange={(event) => setFormProgress(Number(event.target.value))}
                     className="w-full"
-                    style={{ accentColor: '#f3a572' }}
+                    style={{ accentColor: '#7dd3fc' }}
                   />
                   <span className="text-sm text-foreground">{formProgress}%</span>
                 </div>
@@ -773,7 +773,7 @@ const BoardItemCard = ({ item, isOwner, onUpdate, onDelete, onToggleLayout }: Bo
                 value={editedProgress}
                 onChange={(event) => setEditedProgress(Number(event.target.value))}
                 className="w-full"
-                style={{ accentColor: '#f3a572' }}
+                style={{ accentColor: '#7dd3fc' }}
               />
             </div>
           )}

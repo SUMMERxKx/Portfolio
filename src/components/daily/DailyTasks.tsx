@@ -705,7 +705,7 @@ const ConfettiAnimation = () => {
           <div
             className="h-2 w-2 rounded-full"
             style={{
-              backgroundColor: ['#f3a572', '#93b4f6', '#e58b4e', '#f2f5f9'][Math.floor(Math.random() * 4)],
+              backgroundColor: ['#7dd3fc', '#a5b4fc', '#38bdf8', '#bae6fd'][Math.floor(Math.random() * 4)],
             }}
           />
         </div>

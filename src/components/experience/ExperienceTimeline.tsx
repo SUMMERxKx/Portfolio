@@ -63,7 +63,7 @@ const TimelineArticle = ({ entry, index, position }: TimelineArticleProps) => {
   return (
     <div className={['relative', positionClass].join(' ')}>
       <article
-        className="timeline-item group relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-[radial-gradient(circle_at_top,rgba(243,165,114,0.18),rgba(18,22,30,0.65))] p-6 shadow-[0_22px_70px_rgba(8,10,15,0.42)] transition-transform duration-500 hover:-translate-y-1.5 sm:rounded-[26px] sm:p-7 md:rounded-[28px] md:p-9 lg:p-10"
+        className="timeline-item group relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.18),rgba(18,25,42,0.65))] p-6 shadow-[0_22px_70px_rgba(8,10,15,0.42)] transition-transform duration-500 hover:-translate-y-1.5 sm:rounded-[26px] sm:p-7 md:rounded-[28px] md:p-9 lg:p-10"
         style={{ animationDelay: `${index * 0.08}s` }}
       >
         <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
@@ -92,7 +92,7 @@ const TimelineArticle = ({ entry, index, position }: TimelineArticleProps) => {
           </header>
 
           <div className="relative overflow-hidden rounded-[18px] border border-white/[0.06] bg-white/[0.03] p-[0.5px] sm:rounded-[20px]">
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(243,165,114,0.22),rgba(147,180,246,0.1))] opacity-80 blur-[6px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(125,211,252,0.22),rgba(165,180,252,0.1))] opacity-80 blur-[6px]" />
             <div className="relative flex flex-wrap items-center justify-between gap-2 rounded-[17px] bg-[rgba(8,11,17,0.7)] px-3 py-2.5 sm:gap-3 sm:rounded-[19px] sm:px-4 sm:py-3">
               <span className="text-[9px] uppercase tracking-[0.28em] text-secondary-muted sm:text-[10px] sm:tracking-[0.32em]">
                 Duration
@@ -106,7 +106,7 @@ const TimelineArticle = ({ entry, index, position }: TimelineArticleProps) => {
           <ul className="space-y-2.5 text-sm leading-relaxed text-foreground-soft sm:space-y-3">
             {entry.highlights.map((highlight) => (
               <li key={highlight} className="flex items-start gap-3">
-                <span aria-hidden="true" className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(243,165,114,0.6)] sm:mt-2" />
+                <span aria-hidden="true" className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(125,211,252,0.6)] sm:mt-2" />
                 <span>{highlight}</span>
               </li>
             ))}
