@@ -11,7 +11,6 @@ const links = [
   { href: '/projects', label: 'Projects' },
   { href: '/skills', label: 'Skills' },
   { href: '/about', label: 'About' },
-  { href: '/coop-final-project', label: 'Coop' },
   { href: '/task-board', label: 'Board' },
   { href: '/contact', label: 'Contact' },
 ];
